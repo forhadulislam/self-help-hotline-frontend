@@ -42,7 +42,9 @@ body{
     padding-top: 10em;
     padding-bottom: 10em;
 }
-
+.jumbotron.search{
+    padding-top: 8em;
+}
 .search-slogan{
     color: #525252;
     text-align: center;
@@ -52,6 +54,10 @@ body{
     font-family: 'Nixie One', cursive;
     font-family: 'Scope One', serif;
     font-size: 3em;
+}
+.container.search{
+    margin-top: -8em;
+    background: #fff;
 }
 .search-form input, .search-form select{
     border-radius: 0;

@@ -3,39 +3,64 @@ import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 're
 import logos from './logo.svg';
 import './App.css';
 
-const Home = () => (
 
-  <div className="top-container">
-    <Nav />
+  
+class Home extends Component {
+  
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  
+  handleSubmit(event) {
+    console.log('An essay was submitted: ');
+    var keyword = this.refs.keyword.value;
+    var category = this.refs.category.value;
+    console.log(category + " - " + keyword);
     
-    <div className="jumbotron">
-    
-      <div className="container">
-        <div className="col-md-8 col-md-offset-2">
-        <h2 className="search-slogan">Search questions</h2>
-          <form className="form search-form">
-            <div className="form-group col-md-6">
-              <input type="text" name="keyword" className="form-control" id="keyword" />
-            </div>
+    location.href = "#/search/keyword=" + keyword + "&category=" + category;
+    event.preventDefault();
+  }
+
+  render() {
+    return (
+      
+      <div className="top-container">
+          <Nav />
           
-            <div className="form-group col-md-4">
-              <select className="form-control" id="category" name="category">
-                <option value="All">Categories</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
+          <div className="jumbotron">
           
-            <div className="form-group col-md-2">
-              <button type="submit" className="btn btn-default btn-block">Search</button>
+            <div className="container">
+              <div className="col-md-8 col-md-offset-2">
+              <h2 className="search-slogan">Search questions</h2>
+                <form className="form search-form" onSubmit={this.handleSubmit}>
+                  <div className="form-group col-md-6">
+                    <input type="text" name="keyword" className="form-control" id="keyword" ref='keyword' />
+                  </div>
+                
+                  <div className="form-group col-md-4">
+                    <select className="form-control" id="category" ref="category" name="category">
+                      <option value="All">Categories</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                    </select>
+                  </div>
+                
+                  <div className="form-group col-md-2">
+                    <button type="submit" className="btn btn-default btn-block">Search</button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  );
+          </div>
+        </div>      
+      
+    )}
+
+
+  
+}
 
 
 const Nav = () => (
@@ -50,7 +75,7 @@ const Nav = () => (
             <span className="icon-bar"></span>
           </button>
           <a className="navbar-brand logo" href="/">
-            <img src="#" />
+            <img src="#/" alt="Logo" />
           </a>
         </div>
         <div id="navbar" className="navbar-collapse collapse">
@@ -73,8 +98,16 @@ const Nav = () => (
 
 const Address = () => (<h1>We are located at 555 Jackson St.</h1>);
 
-const NotFound = () => (
-  <h1>404.. This page is not found!</h1>);
+class NotFound extends Component {
+  
+  render() {
+    return (
+        <h1>Error 404 .. This page is not found!</h1>
+      )
+  
+  
+  }
+}
 
 
 
@@ -88,7 +121,7 @@ const Login = () => (
     	       <div className="content col-md-4 col-md-offset-4">
     	         
     	         <div className="form-logo text-center">
-    	             <a href="/"><img src="https://goo.gl/XEUwU6" /></a>
+    	             <a href="#/"><img src="https://goo.gl/XEUwU6" alt="Logo" /></a>
     	         </div>
     	         <h3 className="title">Login</h3>
     	         <form className="form login-form">
@@ -130,7 +163,7 @@ const Register = () => (
     	       <div className="content col-md-4 col-md-offset-4">
     	         
     	         <div className="form-logo text-center">
-    	             <a href="/"><img src="https://goo.gl/XEUwU6" /></a>
+    	             <a href="#/"><img src="https://goo.gl/XEUwU6" alt="Logo" /></a>
     	         </div>
     	         <h3 className="title">Register</h3>
     	         <form className="form login-form">
@@ -170,16 +203,90 @@ const Register = () => (
   
   );
   
-const Post = (props) => (
+
+class Search extends Component {
   
-    <div>
-      <Nav />
+  render() {
+    return (
+      
+      <div className="top-container">
+          <Nav />
+        
+          <div className="jumbotron search"></div>
+          
+          <div className="container search">
+              <div className="col-md-10 col-md-offset-1">
+                <h2 className="search-slogan">Search questions</h2>
+                <form className="form search-form" onSubmit={this.handleSubmit}>
+                  <div className="form-group col-md-8 col-md-offset-1">
+                    <input type="text" name="keyword" className="form-control" id="keyword" ref='keyword' value={this.props.params.query} />
+                  </div>
+                  
+                
+                  <div className="form-group col-md-2">
+                    <button type="submit" className="btn btn-default btn-block">Search</button>
+                  </div>
+                </form>
+              </div>
+              
+              <div className="col-md-8 col-md-offset-2">
+                <div className="col-md-4">
+                  <ul className="search-category list-unstyled" id="category" ref="category" name="category">
+                    <h4>Filter by categories</h4>
+                    <li value="All">Categories</li>
+                    <li value="2">2</li>
+                    <li value="3">3</li>
+                    <li value="4">4</li>
+                  </ul>
+                </div>
+                <div className="col-md-8">
+                  <ul className="list-unstyled">
+                    <li>
+                      <h4>Search item 1</h4>
+                      <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+                      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                    </li>
+                    <li>
+                      <h3>Search item 2</h3>
+                      <p>is simply dummy text of the printing and typesetting industry. 
+                      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                    </li>
+                    <li>
+                      <h3>Search item 3</h3>
+                      <p>dummy text of the printing and typesetting industry. 
+                      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                    </li>
+                    <li>
+                      <h3>Search item 4</h3>
+                      <p>Ipsum is simply dummy text of the printing and typesetting industry. 
+                      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+            </div>
+        </div>
     
-      <h3>Welcome to the Post Page</h3>
-      <h2>{props.params.name}</h2>
-    </div>
+    )
+  }
+}
+
+
+class Post extends Component {
   
-);
+  render() {
+    return (
+      <div>
+        <Nav />
+      
+        <h3>Welcome to the Post Page</h3>
+        <h2>{this.props.params.name}</h2>
+      </div>
+    
+    )
+  }
+}
 
 class App extends Component {
   
@@ -190,7 +297,8 @@ class App extends Component {
         <Route path="/address" component={Address} />
         <Route path="login" component={Login} />
         <Route path="register" component={Register} />
-        <Route path='/post/:name' component={Post} />
+        <Route path='search/:query' component={Search} />
+        <Route path='post/:name' component={Post} />
         <Route path="*" component={NotFound} />
       </Router>
     );
