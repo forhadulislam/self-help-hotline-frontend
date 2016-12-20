@@ -1,4 +1,4 @@
- var config = {
+var config = {
     apiKey: "AIzaSyBYSz3_wDygl1aC3-qYMNMKHJFhGMDh850",
     authDomain: "self-help-hotline-acp.firebaseapp.com",
     databaseURL: "https://self-help-hotline-acp.firebaseio.com",
@@ -7,31 +7,36 @@
 };
 firebase.initializeApp(config);
 
+var allCategory = [];
+var all, hasData = {};
+
+
+/*categories.on("value", function(snapshot) {
+	hasData = snapshot.val();
+  	if(hasData){
+  	    for(a in hasData){
+            allCategory.push(hasData[a].title);
+  	    }
+  	    all = JSON.stringify(hasData);
+  	}else{
+  		console.log("No categories available");
+  	}
+}, function (error) {
+   console.log("Error: " + error.code);
+});*/
+
+
+
+var c = getCategories();
+console.log( c );
+
 $(document).ready(function(){
     
     var database = firebase.database();
     var loggedInUsername = localStorage['username'];
     
-    var categories = firebase.database().ref("categories/");
-    categories.once("value", function(snapshot) {
-    	var hasData = snapshot.val();
-      	if(hasData){
-      	    console.log(hasData.title);
-      	}else{
-      		console.log("No categories available");
-      	}
-    }, function (error) {
-       console.log("Error: " + error.code);
-    });
-    
 	 
-    function writeUserData(username, email, password) {
-	  firebase.database().ref('users/' + username).set({
-	    username: username,
-	    password: password,
-	    email: email
-	  });
-	}
+    
 	
     $(".login-form").submit(function(e){
         e.preventDefault();
@@ -59,12 +64,6 @@ $(document).ready(function(){
         }, function (error) {
            console.log("Error: " + error.code);
         });
-        
-        /*searchUser.once('value').then(function(snapshot) {
-          
-          console.log(snapshot.val());
-          console.log(snapshot.val().username);
-        });*/
         
         return false;
     });
@@ -107,10 +106,3 @@ $(document).ready(function(){
     });
     
 })
-
-
-
-
-
-
-

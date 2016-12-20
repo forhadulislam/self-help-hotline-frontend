@@ -2,17 +2,40 @@ import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 import logos from './logo.svg';
 import './App.css';
-import * as firebase from '../public/js/firebase';
-import '../public/js/main.js'
+import {firebase, config, app} from './Config.js';
+//import allCategory from '../public/js/main.js';
+
+console.log(config);
+
+function getCategories(){
+    var categories = app.database().ref("categories/");
+    var allCategory = [];
+    categories.once('value').then(function(snapshot) {
+        snapshot.forEach(function(userSnapshot) {
+            var cat = userSnapshot.val();
+            allCategory.push(cat);
+        });
+        console.log(allCategory);
+        return allCategory;
+    });
+}
 
 
-  
+function addUserData(username, email, password) {
+  firebase.database().ref('users/' + username).set({
+    username: username,
+    password: password,
+    email: email
+  });
+}
+
+getCategories();
+
 class Home extends Component {
   
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    console.log( localStorage['username'] );
   }
   
   handleSubmit(event) {
@@ -35,18 +58,15 @@ class Home extends Component {
           
             <div className="container">
               <div className="col-md-8 col-md-offset-2">
-              <h2 className="search-slogan">Search questions</h2>
+              <h2 className="search-slogan">Search questions</h2> 
                 <form className="form search-form" onSubmit={this.handleSubmit}>
                   <div className="form-group col-md-6">
                     <input type="text" name="keyword" className="form-control" id="keyword" ref='keyword' />
                   </div>
                 
                   <div className="form-group col-md-4">
-                    <select className="form-control" id="category" ref="category" name="category">
+                    <select className="form-control category" id="category" ref="category" name="category">
                       <option value="All">Categories</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
                     </select>
                   </div>
                 
@@ -138,47 +158,85 @@ class NotFound extends Component {
 }
 
 
-
-const Login = () => (
+class Login extends Component {
   
-  <div className="form-container">
+  constructor(props) {
+    super(props);
+    this.handleLogin = this.handleLogin.bind(this);
+  }
+  
+  handleLogin(event){
+    event.preventDefault();
     
-      <div className="general-forms">
-    	  <div className="container">
-    	    <div className="row">
-    	       <div className="content col-md-4 col-md-offset-4">
-    	         
-    	         <div className="form-logo text-center">
-    	             <a href="#/"><img src="https://goo.gl/XEUwU6" alt="Logo" /></a>
-    	         </div>
-    	         <h3 className="title">Login</h3>
-    	         <form className="form login-form">
-  	        	  <div className="form-group">
-          	        <label>Username</label>
-      				   <input type="text" className="form-control" id="username" />
-      				  </div>
-      				  
-      				  <div className="form-group">
-      				    <label>Password</label>
-      				    <input type="password" className="form-control" id="password" />
-      				  </div>
-  				      
-  				      <div className="form-group">
-  				        <button type="submit" className="btn btn-default btn-block">Login</button>
-  				      </div>
-  	               </form>
-  	           
-                  <div className="form-group">
-          		    <small><a href="/forgot-password">Forgot your password?</a></small>
-          		  </div>
-    	       </div>
-  	    	  
-      	     </div>
-        	</div>
-        </div>
-    </div>
+    var username = this.refs.username.value;
+    var password = this.refs.password.value;
+    
+    var searchUser = app.database().ref("users/" + username);
+      searchUser.once("value", function(snapshot) {
+      	var hasData = snapshot.val();
+      	if(hasData){
+      	    var accPassword = snapshot.val().password;
+      		if (accPassword === password) {
+                localStorage['username'] = username;
+                location.href = "#/";
+                console.log(localStorage['username']);
+            }else{
+                console.log("Invalid credentials");
+            }
+            
+      	}else{
+      		console.log("Invalid credentials!! Please try again.");
+      	}
+    }, function (error) {
+       console.log("Error: " + error.code);
+    });
+    
+    return false;
+  }
   
-  );
+  render() {
+    return (
+      <div className="form-container">
+      
+        <div className="general-forms">
+      	  <div className="container">
+      	    <div className="row">
+      	       <div className="content col-md-4 col-md-offset-4">
+      	         
+      	         <div className="form-logo text-center">
+      	             <a href="#/"><img src="https://goo.gl/XEUwU6" alt="Logo" /></a>
+      	         </div>
+      	         <h3 className="title">Login</h3>
+      	         <form className="form login-form" onSubmit={ this.handleLogin }>
+    	        	  <div className="form-group">
+            	        <label>Username</label>
+        				   <input type="text" className="form-control" id="username" ref="username" />
+        				  </div>
+        				  
+        				  <div className="form-group">
+        				    <label>Password</label>
+        				    <input type="password" className="form-control" id="password" ref="password" />
+        				  </div>
+    				      
+    				      <div className="form-group">
+    				        <button type="submit" className="btn btn-default btn-block">Login</button>
+    				      </div>
+    	               </form>
+    	           
+                    <div className="form-group">
+            		    <small><a href="/forgot-password">Forgot your password?</a></small>
+            		  </div>
+      	       </div>
+    	    	  
+        	     </div>
+          	</div>
+          </div>
+      </div>
+    )
+  
+  
+  }
+};
   
 class Register extends Component {
     
