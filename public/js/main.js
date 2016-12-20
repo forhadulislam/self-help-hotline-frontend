@@ -12,6 +12,18 @@ $(document).ready(function(){
     var database = firebase.database();
     var loggedInUsername = localStorage['username'];
     
+    var categories = firebase.database().ref("categories/");
+    categories.once("value", function(snapshot) {
+    	var hasData = snapshot.val();
+      	if(hasData){
+      	    console.log(hasData.title);
+      	}else{
+      		console.log("No categories available");
+      	}
+    }, function (error) {
+       console.log("Error: " + error.code);
+    });
+    
 	 
     function writeUserData(username, email, password) {
 	  firebase.database().ref('users/' + username).set({
@@ -21,11 +33,46 @@ $(document).ready(function(){
 	  });
 	}
 	
+    $(".login-form").submit(function(e){
+        e.preventDefault();
+        
+        console.log("Submitted");
+        var username = $("#username").val();
+        var password = $("#password").val();
+        
+        var searchUser = firebase.database().ref("users/" + username);
+        searchUser.once("value", function(snapshot) {
+        	var hasData = snapshot.val();
+          	if(hasData){
+          	    var accPassword = snapshot.val().password;
+          		if (accPassword === password) {
+                    localStorage['username'] = username;
+                    location.href = "#/";
+                    console.log(localStorage['username']);
+                }else{
+                    console.log("Invalid credentials");
+                }
+                
+          	}else{
+          		console.log("Invalid credentials!! Please try again.");
+          	}
+        }, function (error) {
+           console.log("Error: " + error.code);
+        });
+        
+        /*searchUser.once('value').then(function(snapshot) {
+          
+          console.log(snapshot.val());
+          console.log(snapshot.val().username);
+        });*/
+        
+        return false;
+    });
+    
     
     $(".register-form").submit(function(e){
         e.preventDefault();
         
-        console.log("Submitted"); 
         var username = $("#username").val();
         var email = $("#email").val();
         var password = $("#password").val();
