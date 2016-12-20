@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
 import logos from './logo.svg';
 import './App.css';
+import * as firebase from '../public/js/firebase';
+import '../public/js/main.js'
 
 
   
@@ -10,6 +12,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+    console.log( localStorage['username'] );
   }
   
   handleSubmit(event) {
@@ -63,7 +66,37 @@ class Home extends Component {
 }
 
 
-const Nav = () => (
+class Nav extends Component {
+  
+  constructor(props) {
+    super(props);
+    var isLoggedIn = localStorage['username'];
+    this.state = {isLoggedIn: isLoggedIn};
+  }
+
+  render() {
+    
+    let menuLinks = null;
+		if ( this.state.isLoggedIn ) {
+  		menuLinks = (
+    		<span>
+          <a href="#/settings" className="btn">Account settings</a>
+      		<a href="#/create-post" className="btn">Create Post</a>
+      		<a href="#/posts" className="btn">My posts</a>
+      		<a href="#/logout" className="btn">Logout</a>
+    		</span>
+  		)
+    } else {
+      menuLinks = (
+        <span>
+          <a href="#/login" className="btn">Login</a>
+    		  <a href="#/register" className="btn">Register</a>
+    		</span>
+    	)
+    }
+    
+    return (
+      
   
     <nav className="navbar top-menu navbar-inverse navbar-fixed-top">
       <div className="container">
@@ -80,21 +113,16 @@ const Nav = () => (
         </div>
         <div id="navbar" className="navbar-collapse collapse">
           <div className="navbar-form navbar-right">
-	        	<a href="#/login" className="btn">Login</a>
-	      		<a href="#/register" className="btn">Register</a>
-	      		
-	      		
-	      		<a href="#/settings" className="btn">Account settings</a>
-	      		<a href="#/create-post" className="btn">Create Post</a>
-	      		<a href="#/posts" className="btn">My posts</a>
-	      		<a href="#/logout" className="btn">Logout</a>
-	      		
+	      		{menuLinks}
           </div>
         </div>
       </div>
     </nav>
   
-  );
+    )
+  }
+  
+}
 
 const Address = () => (<h1>We are located at 555 Jackson St.</h1>);
 
@@ -152,9 +180,10 @@ const Login = () => (
   
   );
   
-  
-const Register = () => (
+class Register extends Component {
     
+  render() {
+    return (
     <div className="form-container">
     
         <div className="general-forms">
@@ -166,7 +195,7 @@ const Register = () => (
     	             <a href="#/"><img src="https://goo.gl/XEUwU6" alt="Logo" /></a>
     	         </div>
     	         <h3 className="title">Register</h3>
-    	         <form className="form login-form">
+    	         <form className="form register-form">
   	        	  <div className="form-group">
   	        	    <label>Username</label>
   				        <input type="text" className="form-control" id="username" />
@@ -201,10 +230,87 @@ const Register = () => (
     
   </div>
   
-  );
+  )
+  };
+  
   
 
+}
+
+
+class CreatePost extends Component {
+  
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  
+  onSearchBoxChange(event){
+    
+  }
+  
+  handleSubmit(event) {
+    var category, keyword;
+    var keyword = this.refs.keyword.value;
+    location.href = "#/search/keyword=" + keyword + "&category=" + category;
+    event.preventDefault();
+  }
+  
+  render() {
+    return (
+      
+      <div className="top-container">
+          <Nav />
+        
+          <div className="jumbotron search"></div>
+          
+          <div className="container search">
+              <div className="col-md-8 col-md-offset-2">
+                <h2 className="search-slogan">Create Post</h2>
+                <form className="form search-form" onSubmit={this.handleSubmit}>
+                  
+                  <div className="form-group">
+                    <label>Question title</label>
+                    <input type="text" name="keyword" className="form-control" id="title" />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea type="text" name="keyword" className="form-control" id="desc"></textarea>
+                  </div>
+                
+                  <div className="form-group">
+                    <button type="submit" className="btn btn-default btn-block">Post</button>
+                  </div>
+                </form>
+              </div>
+              
+              
+            </div>
+        </div>
+    
+    )
+  }
+}
+
+
 class Search extends Component {
+  
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  
+  onSearchBoxChange(event){
+    
+  }
+  
+  handleSubmit(event) {
+    var category, keyword;
+    var keyword = this.refs.keyword.value;
+    location.href = "#/search/keyword=" + keyword + "&category=" + category;
+    event.preventDefault();
+  }
   
   render() {
     return (
@@ -219,7 +325,7 @@ class Search extends Component {
                 <h2 className="search-slogan">Search questions</h2>
                 <form className="form search-form" onSubmit={this.handleSubmit}>
                   <div className="form-group col-md-8 col-md-offset-1">
-                    <input type="text" name="keyword" className="form-control" id="keyword" ref='keyword' value={this.props.params.query} />
+                    <input type="text" name="keyword" className="form-control" id="keyword" ref='keyword' onChange={this.onSearchBoxChange} defaultValue={this.props.params.query} />
                   </div>
                   
                 
@@ -288,6 +394,23 @@ class Post extends Component {
   }
 }
 
+class Logout extends Component{
+  constructor(props) {
+    super(props);
+    localStorage.removeItem("username");
+    location.href = "#/";
+  }
+  
+  render(){
+    return(
+      <div>
+      
+      </div>
+    )
+  }
+  
+}
+
 class App extends Component {
   
   render() {
@@ -298,14 +421,13 @@ class App extends Component {
         <Route path="login" component={Login} />
         <Route path="register" component={Register} />
         <Route path='search/:query' component={Search} />
+        <Route path='create-post' component={CreatePost} />
         <Route path='post/:name' component={Post} />
+        <Route path='logout' component={Logout} />
         <Route path="*" component={NotFound} />
       </Router>
     );
   }
 }
-
-
-
 
 export default App;
